@@ -1,4 +1,5 @@
 // TODO: import module bila dibutuhkan di sini
+const fs = require("fs");
 
 // ! JANGAN DIMODIFIKASI
 let file1 = "./data1.json";
@@ -18,7 +19,55 @@ let modifyFile3 = (val) => {
 
 // TODO: Kerjakan bacaData
 // gunakan variabel file1, file2, dan file3
-const bacaData = null;
+
+let data = [];
+const saveData = (word) => {
+  data.push(word);
+};
+
+const dataGenerator = (rawData) => {
+  if (rawData.message !== undefined) {
+    let processedData = rawData.message.split(" ");
+    return processedData[processedData.length - 1];
+  }
+
+  if (rawData[0].message !== undefined) {
+    let processedData = rawData[0].message.split(" ");
+    return processedData[processedData.length - 1];
+  }
+
+  if (rawData[0].data.message !== undefined) {
+    let processedData = rawData[0].data.message.split(" ");
+    return processedData[processedData.length - 1];
+  }
+};
+
+function bacaData(fnCallback) {
+  fs.readFile(file1, "utf-8", (err, rawData) => {
+    if (err) {
+      fnCallback(err, null);
+    }
+    saveData(dataGenerator(JSON.parse(rawData)));
+    fs.readFile(file2, "utf-8", (err, rawData) => {
+      if (err) {
+        fnCallback(err, null);
+      }
+      saveData(dataGenerator(JSON.parse(rawData)));
+      fs.readFile(file3, "utf-8", (err, rawData) => {
+        if (err) {
+          fnCallback(err, null);
+        }
+        saveData(dataGenerator(JSON.parse(rawData)));
+        fnCallback(
+          null,
+          data.filter((e, i, s) => {
+            return i === s.indexOf(e);
+          })
+        );
+      });
+    });
+  });
+}
 
 // ! JANGAN DIMODIFIKASI
 module.exports = {
